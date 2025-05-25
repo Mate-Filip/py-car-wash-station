@@ -9,7 +9,7 @@ class Car:
         if not isinstance(self.comfort_class, int):
             raise TypeError("comfort_class must be an integer")
         if 1 > self.comfort_class > 7:
-            raise ValueError('comfort_class must be between 1 and 7')
+            raise ValueError("comfort_class must be between 1 and 7")
 
         if not isinstance(self.clean_mark, int):
             raise TypeError("clean_mark must be an integer")
@@ -17,7 +17,7 @@ class Car:
             raise ValueError("clean_mark must be between 1 and 10")
 
         if not isinstance(self.brand, str):
-            raise ValueError('brand must be string')
+            raise ValueError("brand must be string")
         self.brand = brand.upper()
 
 
@@ -33,23 +33,23 @@ class CarWashStation:
         # the city center, from 1.0 to 10.0
         if not isinstance(self.distance_from_city_center, float):
             if 1 >= round(self.distance_from_city_center, 1) >= 10:
-                raise ValueError('distance_from_city_center must '
-                                 'be between 1.0 and 10.0 and must be float')
+                raise ValueError("distance_from_city_center must "
+                                 "be between 1.0 and 10.0 and must be float")
         self.distance_from_city_center = round(distance_from_city_center, 1)
 
         # 2. `clean_power` - `clean_mark` to which this car wash station
         # washes (yes, not all stations can clean your car completely)
         if not isinstance(self.clean_power, int):
             if 1 >= self.clean_power <= 10:
-                raise ValueError('clean_power must be '
-                                 'between 1 and 10 and must be int')
+                raise ValueError("clean_power must be "
+                                 "between 1 and 10 and must be int")
 
         # 3. `average_rating` - average rating of the station,
         # from 1.0 to 5.0, rounded to 1 decimal
         if not isinstance(self.average_rating, float):
             if 1 >= round(self.average_rating, 1) <= 5:
-                raise ValueError('average_rating must be between 1.0 '
-                                 'and 5.0 and must be float')
+                raise ValueError("average_rating must be between 1.0 "
+                                 "and 5.0 and must be float")
         self.average_rating = round(average_rating, 1)
         self.served_cars_list = []
         self.total_income = 0
@@ -86,7 +86,7 @@ class CarWashStation:
         if car in self.served_cars_list:
             self.calculate_washing_price(car)
             self.income += self.washing_price
-            print('Car is served')
+            print("Car is served")
             print(self.income)
             print(self.car.clean_mark)
         else:
@@ -94,11 +94,11 @@ class CarWashStation:
                 self.served_cars_list.append(car)
                 self.calculate_washing_price(car)
                 self.income += self.washing_price
-                print('Car is served')
+                print("Car is served")
                 print(self.income)
                 print(self.car.clean_mark)
             else:
-                print('Car is NOT served')
+                print("Car is NOT served")
 
     # 4. `rate_service` - method that adds a single rate to
     # the wash station, and based on this single rate
