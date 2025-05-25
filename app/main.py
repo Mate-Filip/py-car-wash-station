@@ -1,5 +1,4 @@
 class Car:
-
     def __init__(self, comfort_class: int,
                  clean_mark: int, brand: str) -> None:
         self.comfort_class = comfort_class
@@ -8,12 +7,12 @@ class Car:
 
         if not isinstance(self.comfort_class, int):
             raise TypeError("comfort_class must be an integer")
-        if 1 > self.comfort_class > 7:
+        if not 1 <= self.comfort_class <= 7:
             raise ValueError("comfort_class must be between 1 and 7")
 
         if not isinstance(self.clean_mark, int):
             raise TypeError("clean_mark must be an integer")
-        if 1 >= self.clean_mark >= 10:
+        if not 1 <= self.clean_mark <= 10:
             raise ValueError("clean_mark must be between 1 and 10")
 
         if not isinstance(self.brand, str):
@@ -22,90 +21,65 @@ class Car:
 
 
 class CarWashStation:
-
     def __init__(self, distance_from_city_center: float,
-                 clean_power: int, average_rating: int) -> None:
-        self.distance_from_city_center = distance_from_city_center
+                 clean_power: int, average_rating: float,
+                 count_of_ratings: int = 0) -> None:
+
+        # Walidacja distance_from_city_center
+        if not isinstance(distance_from_city_center, (int, float)):
+            raise TypeError("distance_from_city_center must be numeric")
+        self.distance_from_city_center = round(float(distance_from_city_center), 1)
+        if not 1.0 <= self.distance_from_city_center <= 10.0:
+            raise ValueError("distance_from_city_center must be between 1.0 and 10.0")
+
+        # Walidacja clean_power
+        if not isinstance(clean_power, int):
+            raise TypeError("clean_power must be integer")
+        if not 1 <= clean_power <= 10:
+            raise ValueError("clean_power must be between 1 and 10")
         self.clean_power = clean_power
-        self.average_rating = average_rating
 
-        # 1. `distance_from_city_center` - how far station from
-        # the city center, from 1.0 to 10.0
-        if not isinstance(self.distance_from_city_center, float):
-            if 1 >= round(self.distance_from_city_center, 1) >= 10:
-                raise ValueError("distance_from_city_center must "
-                                 "be between 1.0 and 10.0 and must be float")
-        self.distance_from_city_center = round(distance_from_city_center, 1)
+        # Walidacja average_rating
+        if not isinstance(average_rating, (int, float)):
+            raise TypeError("average_rating must be numeric")
+        self.average_rating = round(float(average_rating), 1)
+        if not 1.0 <= self.average_rating <= 5.0:
+            raise ValueError("average_rating must be between 1.0 and 5.0")
 
-        # 2. `clean_power` - `clean_mark` to which this car wash station
-        # washes (yes, not all stations can clean your car completely)
-        if not isinstance(self.clean_power, int):
-            if 1 >= self.clean_power <= 10:
-                raise ValueError("clean_power must be "
-                                 "between 1 and 10 and must be int")
+        # Inicjalizacja pozostałych atrybutów
+        self.served_cars = []
+        self.total_income = 0.0
+        self.count_of_ratings = count_of_ratings
 
-        # 3. `average_rating` - average rating of the station,
-        # from 1.0 to 5.0, rounded to 1 decimal
-        if not isinstance(self.average_rating, float):
-            if 1 >= round(self.average_rating, 1) <= 5:
-                raise ValueError("average_rating must be between 1.0 "
-                                 "and 5.0 and must be float")
-        self.average_rating = round(average_rating, 1)
-        self.served_cars_list = []
-        self.total_income = 0
-    # 4. `count_of_ratings` - number of people who rated
-        self.count_of_ratings = 0
-
-    # `CarWashStation` should have such methods:
-    # 1. `serve_cars` - method, that takes a list of `Car`'s, washes only
-    # cars with `clean_mark` < `clean_power` of wash station
-    # and returns income of `CarWashStation` for serving this list of Car's,
-    # rounded to 1 decimal:
-    def serve_cars(self, cars: list) -> None:
+    def serve_cars(self, cars: list['Car']) -> float:
+        self.total_income = 0.0
         for car in cars:
-            self.wash_single_car(car)
+            income = self.wash_single_car(car)
+            self.total_income += income
+        return round(self.total_income, 1)
 
-    # 2. `calculate_washing_price` - method, that calculates cost for a
-    # single car wash,
-    # cost is calculated as: car's comfort class * difference between
-    # wash station's clean power and car's clean mark * car wash station
-    # rating / car wash station
-    # distance to the center of the city, returns number rounded
-    # to 1 decimal;
-    def calculate_washing_price(self, car: Car) -> float:
-        self.washing_price = round(car.comfort_class * (
-            self.clean_power - ((car.clean_mark * self.average_rating)
-                                / self.distance_from_city_center)), 1)
-        return self.washing_price
+    def calculate_washing_price(self, car: 'Car') -> float:
+        clean_diff = self.clean_power - car.clean_mark
+        price = (car.comfort_class * clean_diff * self.average_rating /
+                 self.distance_from_city_center)
+        return round(price, 1)
 
-    # 3. `wash_single_car` - method, that washes a single car, so it should
-    # have `clean_mark` equals wash station's `clean_power`, if
-    # `wash_station.clean_power` is greater than `car.clean_mark`;
-    def wash_single_car(self, car: Car) -> None:
-        self.income = 0
-        if car in self.served_cars_list:
-            self.calculate_washing_price(car)
-            self.income += self.washing_price
-            print("Car is served")
-            print(self.income)
-            print(self.car.clean_mark)
-        else:
-            if car.clean_mark < self.clean_power:
-                self.served_cars_list.append(car)
-                self.calculate_washing_price(car)
-                self.income += self.washing_price
-                print("Car is served")
-                print(self.income)
-                print(self.car.clean_mark)
-            else:
-                print("Car is NOT served")
+    def wash_single_car(self, car: 'Car') -> float:
+        if car.clean_mark < self.clean_power:
+            price = self.calculate_washing_price(car)
+            car.clean_mark = self.clean_power
+            self.served_cars.append(car)
+            return price
+        return 0.0
 
-    # 4. `rate_service` - method that adds a single rate to
-    # the wash station, and based on this single rate
-    # `average_rating` and `count_of_ratings` should be changed:
     def rate_service(self, rate: int) -> None:
-        self.rate = rate
-        self.average_rating = (
-            (self.average_rating * self.count_of_ratings + self.rate)
-            / self.count_of_ratings + 1)
+        if not isinstance(rate, int) or not 1 <= rate <= 5:
+            raise ValueError("Rate must be integer between 1 and 5")
+
+        if self.count_of_ratings == 0:
+            self.average_rating = float(rate)
+        else:
+            total = self.average_rating * self.count_of_ratings + rate
+            self.average_rating = round(total / (self.count_of_ratings + 1), 1)
+
         self.count_of_ratings += 1
